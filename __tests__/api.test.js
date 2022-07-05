@@ -34,6 +34,14 @@ describe("3. GET /api/categories", () => {
         });
       });
   });
+  test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
+    return request(app)
+      .get("/api/categoriez")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Path");
+      });
+  });
 });
 
 describe("3. GET /api/reviews/:review_id", () => {
@@ -63,19 +71,7 @@ describe("3. GET /api/reviews/:review_id", () => {
         });
       });
   });
-});
-
-//ERROR HANDLERS
-describe("3. GET ERRORS", () => {
-  test("Responds with a 404 not found when passed an invalid path", () => {
-    return request(app)
-      .get("/api/categoriez")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid Path");
-      });
-  });
-  test("Responds with a 404 not found when passed an id that does not exist", () => {
+  test("ERROR 404 SResponds with a 404 not found when passed an id that does not exist", () => {
     return request(app)
       .get("/api/reviews/42")
       .expect(404)
@@ -83,12 +79,79 @@ describe("3. GET ERRORS", () => {
         expect(msg).toBe("No review found for review_id: 42");
       });
   });
-  test("Responds with a 400 Bad request when passed an invalid review_id type", () => {
+  test("ERROR 400: Responds with a 400 Bad request when passed an invalid review_id type", () => {
     return request(app)
       .get("/api/reviews/not_a_number")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Input");
+      });
+  });
+});
+
+describe("PATCH /api/reviews/:review_id", () => {
+  test("Responds with the object showing the votes amended with positve vote", () => {
+    const newVotes = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/reviews/10")
+      .send(newVotes)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toEqual({
+          review_id: 10,
+          title: "Build you own tour de Yorkshire",
+          designer: "Asger Harding Granerud",
+          owner: "mallionaire",
+          review_img_url:
+            "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          review_body:
+            "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
+          category: "social deduction",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: 20,
+        });
+      });
+  });
+  test("Responds with the object showing the votes amended with negative vote", () => {
+    const newVotes = { inc_votes: -100 };
+    return request(app)
+      .patch("/api/reviews/10")
+      .send(newVotes)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toEqual({
+          review_id: 10,
+          title: "Build you own tour de Yorkshire",
+          designer: "Asger Harding Granerud",
+          owner: "mallionaire",
+          review_img_url:
+            "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          review_body:
+            "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
+          category: "social deduction",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: -90,
+        });
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a body with malformed/missing fields", () => {
+    const newVotes = {};
+    return request(app)
+      .patch("/api/reviews/10")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or incorrect fields required in body");
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a body with incorrect type", () => {
+    const newVotes = { inc_votes: "ten" };
+    return request(app)
+      .patch("/api/reviews/10")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or incorrect fields required in body");
       });
   });
 });

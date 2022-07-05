@@ -1,5 +1,9 @@
 const express = require("express");
-const { getCategories, getReviewById } = require("./controller/controller");
+const {
+  getCategories,
+  getReviewById,
+  patchReviewVotes,
+} = require("./controller/controller");
 const {
   handleInvalidPath,
   handle500Error,
@@ -10,8 +14,12 @@ const app = express();
 
 app.use(express.json());
 
+//GET
 app.get("/api/categories", getCategories);
 app.get("/api/reviews/:review_id", getReviewById);
+
+//PATCH
+app.patch("/api/reviews/:review_id", patchReviewVotes);
 
 //ERROR HANDLERS
 app.all("*", handleInvalidPath);
