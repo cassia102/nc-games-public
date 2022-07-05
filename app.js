@@ -1,13 +1,22 @@
 const express = require("express");
-const { getCategories } = require("./controller/controller");
+const { getCategories, getReviewById } = require("./controller/controller");
+const {
+  handleInvalidPath,
+  handle500Error,
+  handleCustomError,
+  handleInvalidInput,
+} = require("./controller/controller.errors");
 const app = express();
 
 app.use(express.json());
 
 app.get("/api/categories", getCategories);
+app.get("/api/reviews/:review_id", getReviewById);
 
-app.use("*", (req, res) => {
-  res.status(404).send({ msg: "Not Found" });
-});
+//ERROR HANDLERS
+app.all("*", handleInvalidPath);
+app.use(handleCustomError);
+app.use(handleInvalidInput);
+app.use(handle500Error);
 
 module.exports = app;
