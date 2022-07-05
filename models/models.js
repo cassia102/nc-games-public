@@ -1,8 +1,15 @@
 const db = require("../db/connection");
 const reviews = require("../db/data/test-data/reviews");
 
+//GET
 exports.fetchCategories = () => {
   return db.query("SELECT * FROM categories;").then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.fetchUsers = () => {
+  return db.query("SELECT * FROM users;").then(({ rows }) => {
     return rows;
   });
 };
@@ -21,8 +28,8 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
+//PATCH
 exports.updatedReviewsById = (review_id, inc_votes) => {
-  console.log(Object);
   let queryValue = reviews[review_id - 1].votes;
   if (typeof inc_votes !== "number") {
     return Promise.reject({

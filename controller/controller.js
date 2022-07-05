@@ -2,8 +2,10 @@ const {
   fetchCategories,
   fetchReviewById,
   updatedReviewsById,
+  fetchUsers,
 } = require("../models/models");
 
+//GET
 exports.getCategories = (req, res, next) => {
   fetchCategories()
     .then((categories) => {
@@ -25,6 +27,17 @@ exports.getReviewById = (req, res, next) => {
     });
 };
 
+exports.getUsers = (req, res, next) => {
+  fetchUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+//PATCH
 exports.patchReviewVotes = (req, res, next) => {
   const { review_id } = req.params;
   const { inc_votes } = req.body;
