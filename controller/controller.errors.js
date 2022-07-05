@@ -14,8 +14,9 @@ exports.handleCustomError = (err, req, res, next) => {
 exports.handleInvalidInput = (err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid Input" });
+  } else {
+    next(err);
   }
-  next(err);
 };
 
 exports.handle500Error = (err, req, res, next) => {
