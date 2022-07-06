@@ -43,6 +43,20 @@ exports.fetchReviews = () => {
     });
 };
 
+exports.fetchReviewComments = (review_id) => {
+  return db
+    .query(`SELECT * FROM comments WHERE comments.review_id = $1`, [review_id])
+    .then(({ rows, rowCount }) => {
+      if (rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No comments found for review_id: ${review_id}`,
+        });
+      }
+      return rows;
+    });
+};
+
 //PATCH
 exports.updatedReviewsById = (review_id, inc_votes) => {
   let queryValue = reviews[review_id - 1].votes;

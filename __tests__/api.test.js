@@ -8,6 +8,7 @@ const {
 const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app.js");
+const { expiredCount } = require("../db/connection");
 
 beforeEach(() => seed({ categoryData, commentData, reviewData, userData }));
 
@@ -162,6 +163,46 @@ describe("GET /api/users", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Invalid Path");
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("Responds with an array containing relevant comments  ID passed in", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(3);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              review_id: expect.any(Number),
+              created_at: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("ERROR 404 Responds with a 404 not found when passed an id that does not exist or does not have any reviews", () => {
+    return request(app)
+      .get("/api/reviews/42/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No comments found for review_id: 42");
+      });
+  });
+  test("ERROR 400: Responds with a 400 Bad request when passed an invalid review_id type", () => {
+    return request(app)
+      .get("/api/reviews/not_a_number/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Input");
       });
   });
 });

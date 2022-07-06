@@ -1,9 +1,11 @@
+const reviews = require("../db/data/test-data/reviews");
 const {
   fetchCategories,
   fetchReviewById,
   updatedReviewsById,
   fetchUsers,
   fetchReviews,
+  fetchReviewComments,
 } = require("../models/models");
 
 //GET
@@ -40,6 +42,17 @@ exports.getUsers = (req, res, next) => {
 
 exports.getReviews = (req, res, next) => {
   fetchReviews()
+    .then((reviews) => {
+      res.status(200).send({ reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getReviewComments = (req, res, next) => {
+  const { review_id } = req.params;
+  fetchReviewComments(review_id)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
