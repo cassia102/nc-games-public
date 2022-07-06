@@ -6,6 +6,7 @@ const {
   getUsers,
   getReviews,
   getReviewComments,
+  postComment,
 } = require("./controller/controller");
 const {
   handleInvalidPath,
@@ -26,6 +27,9 @@ app.get("/api/reviews/:review_id/comments", getReviewComments);
 
 //PATCH
 app.patch("/api/reviews/:review_id", patchReviewVotes);
+
+//POST
+app.post("/api/reviews/:review_id/comments", postComment);
 
 //ERROR HANDLERS
 app.all("*", handleInvalidPath);
