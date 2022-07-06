@@ -44,79 +44,125 @@ describe("GET", () => {
         });
     });
   });
+});
 
-  describe("GET /api/reviews/:review_id (comment count)", () => {
-    test("Responds with an array containing relevant review including the comment count from the ID passed in", () => {
-      return request(app)
-        .get("/api/reviews/2")
-        .expect(200)
-        .then(({ body }) => {
-          const { reviews } = body;
-          expect(reviews).toHaveLength(1);
-          reviews.forEach((review) => {
-            expect(review).toEqual(
-              expect.objectContaining({
-                review_id: 2,
-                title: "Jenga",
-                designer: "Leslie Scott",
-                owner: "philippaclaire9",
-                review_img_url:
-                  "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-                review_body: "Fiddly fun for all the family",
-                category: "dexterity",
-                created_at: "2021-01-18T10:01:41.251Z",
-                votes: 5,
-                comment_count: 3,
-              })
-            );
-          });
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  test("Responds with an array containing relevant review including the comment count from the ID passed in", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(1);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              review_id: 2,
+              title: "Jenga",
+              designer: "Leslie Scott",
+              owner: "philippaclaire9",
+              review_img_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+              review_body: "Fiddly fun for all the family",
+              category: "dexterity",
+              created_at: "2021-01-18T10:01:41.251Z",
+              votes: 5,
+              comment_count: 3,
+            })
+          );
         });
-    });
-    test("ERROR 404 SResponds with a 404 not found when passed an id that does not exist", () => {
-      return request(app)
-        .get("/api/reviews/42")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("No review found for review_id: 42");
-        });
-    });
-    test("ERROR 400: Responds with a 400 Bad request when passed an invalid review_id type", () => {
-      return request(app)
-        .get("/api/reviews/not_a_number")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Invalid Input");
-        });
-    });
+      });
   });
+  test("ERROR 404 Responds with a 404 not found when passed an id that does not exist", () => {
+    return request(app)
+      .get("/api/reviews/42")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No review found for review_id: 42");
+      });
+  });
+  test("ERROR 400: Responds with a 400 Bad request when passed an invalid review_id type", () => {
+    return request(app)
+      .get("/api/reviews/not_a_number")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Input");
+      });
+  });
+});
 
-  describe("GET /api/users", () => {
-    test("Responds with an object containing the users", () => {
-      return request(app)
-        .get("/api/users")
-        .expect(200)
-        .then(({ body }) => {
-          const { users } = body;
-          expect(users).toHaveLength(4);
-          users.forEach((user) => {
-            expect(user).toEqual(
-              expect.objectContaining({
-                username: expect.any(String),
-                name: expect.any(String),
-                avatar_url: expect.any(String),
-              })
-            );
-          });
+describe("GET /api/reviews", () => {
+  test("Responds with an array containing relevant review including the comment count from the review ID", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(13);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              review_id: expect.any(Number),
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_img_url: expect.any(String),
+              review_body: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
         });
-    });
-    test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
-      return request(app)
-        .get("/api/userzzz")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Invalid Path");
+      });
+  });
+  test("Test the reviews are returned in desc order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
         });
-    });
+      });
+  });
+  test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
+    return request(app)
+      .get("/api/reviewzzz")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Path");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("Responds with an object containing the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
+    return request(app)
+      .get("/api/userzzz")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Path");
+      });
   });
 });
 
