@@ -32,6 +32,23 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
+exports.fetchReviews = () => {
+  return db
+    .query(
+      `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY created_at DESC
+    `
+    )
+    .then(({ rows, rowCount }) => {
+      if (rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No review found for review_id: ${review_id}`,
+        });
+      }
+      return rows;
+    });
+};
+
 //PATCH
 exports.updatedReviewsById = (review_id, inc_votes) => {
   let queryValue = reviews[review_id - 1].votes;

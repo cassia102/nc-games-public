@@ -3,6 +3,7 @@ const {
   fetchReviewById,
   updatedReviewsById,
   fetchUsers,
+  fetchReviews,
 } = require("../models/models");
 
 //GET
@@ -31,6 +32,16 @@ exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
       res.status(200).send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getReviews = (req, res, next) => {
+  fetchReviews()
+    .then((reviews) => {
+      res.status(200).send({ reviews });
     })
     .catch((err) => {
       next(err);

@@ -4,6 +4,7 @@ const {
   getReviewById,
   patchReviewVotes,
   getUsers,
+  getReviews,
 } = require("./controller/controller");
 const {
   handleInvalidPath,
@@ -19,6 +20,7 @@ app.use(express.json());
 app.get("/api/categories", getCategories);
 app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/users", getUsers);
+app.get("/api/reviews", getReviews);
 
 //PATCH
 app.patch("/api/reviews/:review_id", patchReviewVotes);
