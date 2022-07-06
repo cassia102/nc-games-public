@@ -1,7 +1,15 @@
 const db = require("../db/connection");
+const reviews = require("../db/data/test-data/reviews");
 
+//GET
 exports.fetchCategories = () => {
   return db.query("SELECT * FROM categories;").then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.fetchUsers = () => {
+  return db.query("SELECT * FROM users;").then(({ rows }) => {
     return rows;
   });
 };
@@ -17,5 +25,28 @@ exports.fetchReviewById = (review_id) => {
         });
       }
       return rows;
+    });
+};
+
+//PATCH
+exports.updatedReviewsById = (review_id, inc_votes) => {
+  let queryValue = reviews[review_id - 1].votes;
+  if (typeof inc_votes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: `Missing or incorrect fields required in body`,
+    });
+  } else if (inc_votes > 0) {
+    queryValue += inc_votes;
+  } else if (inc_votes < 0) {
+    queryValue += inc_votes;
+  }
+  return db
+    .query(`UPDATE reviews SET votes=$2 WHERE review_id=$1 RETURNING*;`, [
+      review_id,
+      queryValue,
+    ])
+    .then(({ rows }) => {
+      return rows[0];
     });
 };
