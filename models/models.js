@@ -38,13 +38,7 @@ exports.fetchReviews = () => {
       `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY created_at DESC
     `
     )
-    .then(({ rows, rowCount }) => {
-      if (rowCount === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: `No review found for review_id: ${review_id}`,
-        });
-      }
+    .then(({ rows }) => {
       return rows;
     });
 };
