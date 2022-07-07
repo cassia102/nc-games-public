@@ -317,7 +317,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Missing or invalid input to body");
       });
   });
   test("ERROR 400: Responds with a 400 error when passed a user that does not exist", () => {
@@ -337,7 +337,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Missing or invalid input to body");
       });
   });
   test("ERROR 400: Responds with a 404 error when passed an invalid id", () => {

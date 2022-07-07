@@ -14,6 +14,7 @@ const {
   handleCustomError,
   handleInvalidInput,
   handleInvalidInput2,
+  handleInvalidInput3,
 } = require("./controller/controller.errors");
 const app = express();
 
@@ -37,6 +38,7 @@ app.all("*", handleInvalidPath);
 app.use(handleCustomError);
 app.use(handleInvalidInput);
 app.use(handleInvalidInput2);
+app.use(handleInvalidInput3);
 app.use(handle500Error);
 
 module.exports = app;

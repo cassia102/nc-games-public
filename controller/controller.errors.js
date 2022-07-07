@@ -26,6 +26,14 @@ exports.handleInvalidInput2 = (err, req, res, next) => {
   }
 };
 
+exports.handleInvalidInput3 = (err, req, res, next) => {
+  if (err.code === "23502") {
+    res.status(400).send({ msg: "Missing or invalid input to body" });
+  } else {
+    next(err);
+  }
+};
+
 exports.handle500Error = (err, req, res, next) => {
   console.log(err);
   res.status(500).send({ msg: "Server error" });

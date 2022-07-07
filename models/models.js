@@ -102,22 +102,18 @@ exports.updatedReviewsById = (review_id, inc_votes) => {
 //POST
 exports.sendComment = (review_id, newComment) => {
   const { username, body } = newComment;
-  if (!username || !body || Number.isNaN(review_id)) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid input",
-    });
-  }
+  //   if (!username || !body || Number.isNaN(review_id)) {
+  //     return Promise.reject({
+  //       status: 400,
+  //       msg: "Invalid input",
+  //     });
+  //   }
   return db
-    .query(`SELECT * FROM users WHERE users.username = $1`, [username])
+    .query(
+      `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
+      [body, username, review_id]
+    )
     .then(({ rows }) => {
-      return db
-        .query(
-          `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
-          [body, username, review_id]
-        )
-        .then(({ rows }) => {
-          return rows[0];
-        });
+      return rows[0];
     });
 };
