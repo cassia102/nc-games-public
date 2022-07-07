@@ -300,4 +300,24 @@ describe("POST /api/reviews/:review_id/comments", () => {
         });
       });
   });
+  test("ERROR 400: Responds with a 400 error when passed a body with malformed/missing fields", () => {
+    const newComment = {};
+    return request(app)
+      .post("/api/reviews/4/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or incorrect fields required in body");
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a body with incorrect type", () => {
+    const newComment = { username: 2, body: 102354684654 };
+    return request(app)
+      .patch("/api/reviews/10")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or incorrect fields required in body");
+      });
+  });
 });
