@@ -54,11 +54,7 @@ exports.fetchReviewComments = (review_id) => {
           ])
           .then(({ rows }) => {
             if (rows.length > 0) {
-<<<<<<< HEAD
               return [];
-=======
-              return {};
->>>>>>> e391701f1c0355ffb83700a6c0cdb565e5c36f1f
             } else {
               return Promise.reject({
                 status: 404,
@@ -101,8 +97,8 @@ exports.sendComment = (review_id, newComment) => {
     return Promise.reject({
       status: 400,
       msg: "Invalid input",
+    });
   }
-}
   return db
     .query(`SELECT * FROM users WHERE users.username = $1`, [username])
     .then(({ rows }) => {
