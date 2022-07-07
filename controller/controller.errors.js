@@ -18,7 +18,17 @@ exports.handleInvalidInput = (err, req, res, next) => {
   }
 };
 
+exports.handleInvalidInput2 = (err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(400).send({ msg: "Review ID does not exist yet" });
+  } else {
+    next(err);
+  }
+};
+
 exports.handle500Error = (err, req, res, next) => {
   console.log(err);
   res.status(500).send({ msg: "Server error" });
 };
+
+//23503

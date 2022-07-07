@@ -103,7 +103,6 @@ exports.sendComment = (review_id, newComment) => {
     .query(`SELECT * FROM users WHERE users.username = $1`, [username])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        console.log("here once");
         return Promise.reject({
           status: 400,
           msg: `No user found for username: ${username}`,

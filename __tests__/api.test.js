@@ -330,7 +330,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(body.msg).toBe("Invalid input");
       });
   });
-  test("ERROR 404: Responds with a 404 error when passed an invalid id", () => {
+  test("ERROR 400: Responds with a 404 error when passed an invalid id", () => {
     const newComment = {
       username: "dav3rid",
       body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
@@ -341,6 +341,19 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Input");
+      });
+  });
+  test("ERROR 404: Responds with a 404 error when passed valid details and id that doesnt exist yet", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
+    };
+    return request(app)
+      .post("/api/reviews/42/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Review ID does not exist yet");
       });
   });
 });
