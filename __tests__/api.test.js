@@ -307,27 +307,27 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing or incorrect fields required in body");
+        expect(body.msg).toBe("Invalid input");
       });
   });
-  test("ERROR 400: Responds with a 400 error when passed a body with incorrect type", () => {
-    const newComment = { username: 2, body: 102354684654 };
+  test("ERROR 400: Responds with a 400 error when passed a user that does not exist", () => {
+    const newComment = { username: "turnip", body: "102354684654" };
     return request(app)
       .post("/api/reviews/10/comments")
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing or incorrect fields required in body");
+        expect(body.msg).toBe("No user found for username: turnip");
       });
   });
-  test("ERROR 400: Responds with a 400 error when passed a body with incorrect type", () => {
-    const newComment = { username: 2 };
+  test("ERROR 400: Responds with a 400 error when passed a body with missing fields", () => {
+    const newComment = { username: "dav3rid" };
     return request(app)
       .post("/api/reviews/10/comments")
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Missing or incorrect fields required in body");
+        expect(body.msg).toBe("Invalid input");
       });
   });
   test("ERROR 404: Responds with a 404 error when passed an invalid id", () => {
@@ -336,11 +336,11 @@ describe("POST /api/reviews/:review_id/comments", () => {
       body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
     };
     return request(app)
-      .post("/api/reviews/42/comments")
+      .post("/api/reviews/not_a_number/comments")
       .send(newComment)
-      .expect(404)
+      .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("No review found for review_id: 42");
+        expect(body.msg).toBe("Invalid Input");
       });
   });
 });

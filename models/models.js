@@ -93,19 +93,20 @@ exports.updatedReviewsById = (review_id, inc_votes) => {
 //POST
 exports.sendComment = (review_id, newComment) => {
   const { username, body } = newComment;
-  if (typeof username !== "string" || typeof body !== "string") {
+  if (!username || !body || Number.isNaN(review_id)) {
     return Promise.reject({
       status: 400,
-      msg: `Missing or incorrect fields required in body`,
+      msg: "Invalid input",
     });
   }
   return db
-    .query(`SELECT * FROM reviews WHERE reviews.review_id = $1`, [review_id])
+    .query(`SELECT * FROM users WHERE users.username = $1`, [username])
     .then(({ rows }) => {
       if (rows.length === 0) {
+        console.log("here once");
         return Promise.reject({
-          status: 404,
-          msg: `No review found for review_id: ${review_id}`,
+          status: 400,
+          msg: `No user found for username: ${username}`,
         });
       } else {
         return db
@@ -119,3 +120,53 @@ exports.sendComment = (review_id, newComment) => {
       }
     });
 };
+
+//     const { username, body } = newComment;
+//   if (!username || !body) {
+//     return Promise.reject({
+//       status: 400,
+//       msg: "Missing or incorrect fields required in body",
+//     });
+//   }
+//   return db
+//     .query(`SELECT * FROM users WHERE users.username = $1`, [username])
+//     .then(({ rows }) => {
+//       if (rows.length === 0) {
+//         return Promise.reject({
+//           status: 404,
+//           msg: `No user found for username: ${username}`,
+//         });
+//       }
+//     })
+//     .then(({ rows }) => {
+//       return db
+//         .query(
+//           `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
+//           [body, username, review_id]
+//         )
+//         .then(({ rows }) => {
+//           return rows[0];
+//         });
+//     });
+// };
+
+//   return db
+//     .query(`SELECT * FROM reviews WHERE reviews.review_id = $1`, [review_id])
+//     .then(({ rows }) => {
+//       if (rows.length === 0) {
+//         return Promise.reject({
+//           status: 404,
+//           msg: `No review found for review_id: ${review_id}`,
+//         });
+//       } else {
+//         return db
+//           .query(
+//             `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
+//             [body, username, review_id]
+//           )
+//           .then(({ rows }) => {
+//             return rows[0];
+//           });
+//       }
+//     });
+// };
