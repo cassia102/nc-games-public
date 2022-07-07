@@ -54,7 +54,7 @@ exports.fetchReviewComments = (review_id) => {
           ])
           .then(({ rows }) => {
             if (rows.length > 0) {
-              return {};
+              return [];
             } else {
               return Promise.reject({
                 status: 404,
@@ -100,11 +100,22 @@ exports.sendComment = (review_id, newComment) => {
     });
   }
   return db
-    .query(
-      `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
-      [body, username, review_id]
-    )
+    .query(`SELECT * FROM reviews WHERE reviews.review_id = $1`, [review_id])
     .then(({ rows }) => {
-      return rows[0];
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No review found for review_id: ${review_id}`,
+        });
+      } else {
+        return db
+          .query(
+            `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
+            [body, username, review_id]
+          )
+          .then(({ rows }) => {
+            return rows[0];
+          });
+      }
     });
 };
