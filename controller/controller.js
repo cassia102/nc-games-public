@@ -1,9 +1,12 @@
+const reviews = require("../db/data/test-data/reviews");
 const {
   fetchCategories,
   fetchReviewById,
   updatedReviewsById,
   fetchUsers,
   fetchReviews,
+  fetchReviewComments,
+  sendComment,
 } = require("../models/models");
 
 //GET
@@ -48,6 +51,17 @@ exports.getReviews = (req, res, next) => {
     });
 };
 
+exports.getReviewComments = (req, res, next) => {
+  const { review_id } = req.params;
+  fetchReviewComments(review_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 //PATCH
 exports.patchReviewVotes = (req, res, next) => {
   const { review_id } = req.params;
@@ -55,6 +69,19 @@ exports.patchReviewVotes = (req, res, next) => {
   updatedReviewsById(review_id, inc_votes)
     .then((reviews) => {
       res.status(200).send({ reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+//POST
+exports.postComment = (req, res, next) => {
+  const { review_id } = req.params;
+  const newComment = req.body;
+  sendComment(review_id, newComment)
+    .then((comments) => {
+      res.status(201).send({ comments });
     })
     .catch((err) => {
       next(err);

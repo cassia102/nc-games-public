@@ -16,33 +16,31 @@ afterAll(() => {
 });
 
 //GET TESTS
-describe("GET", () => {
-  describe("GET /api/categories", () => {
-    test("Responds with an array containing categories", () => {
-      return request(app)
-        .get("/api/categories")
-        .expect(200)
-        .then(({ body }) => {
-          const { categories } = body;
-          expect(categories).toHaveLength(4);
-          categories.forEach((category) => {
-            expect(category).toEqual(
-              expect.objectContaining({
-                slug: expect.any(String),
-                description: expect.any(String),
-              })
-            );
-          });
+describe("GET /api/categories", () => {
+  test("Responds with an array containing categories", () => {
+    return request(app)
+      .get("/api/categories")
+      .expect(200)
+      .then(({ body }) => {
+        const { categories } = body;
+        expect(categories).toHaveLength(4);
+        categories.forEach((category) => {
+          expect(category).toEqual(
+            expect.objectContaining({
+              slug: expect.any(String),
+              description: expect.any(String),
+            })
+          );
         });
-    });
-    test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
-      return request(app)
-        .get("/api/categoriez")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Invalid Path");
-        });
-    });
+      });
+  });
+  test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
+    return request(app)
+      .get("/api/categoriez")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Path");
+      });
   });
 });
 
@@ -166,6 +164,54 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("Responds with an array containing relevant comments  ID passed in", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(3);
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              review_id: 2,
+              created_at: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("ERROR 404 Responds with a 404 not found when passed an id that does not exist or does not have any reviews", () => {
+    return request(app)
+      .get("/api/reviews/42/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No comments found for review_id: 42");
+      });
+  });
+  test("ERROR 400: Responds with a 400 Bad request when passed an invalid review_id type", () => {
+    return request(app)
+      .get("/api/reviews/not_a_number/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Input");
+      });
+  });
+  test("200 Responds with an empty object if the review_id exists but has no comments", () => {
+    return request(app)
+      .get("/api/reviews/10/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual({});
+      });
+  });
+});
+
 describe("PATCH /api/reviews/:review_id", () => {
   test("Responds with the object showing the votes amended with positve vote", () => {
     const newVotes = { inc_votes: 10 };
@@ -229,6 +275,29 @@ describe("PATCH /api/reviews/:review_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Missing or incorrect fields required in body");
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("Posts a new comment and responds with comment object", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
+    };
+    return request(app)
+      .post("/api/reviews/4/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comments).toEqual({
+          comment_id: 7,
+          body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
+          votes: 0,
+          author: "dav3rid",
+          review_id: 4,
+          created_at: expect.any(String),
+        });
       });
   });
 });

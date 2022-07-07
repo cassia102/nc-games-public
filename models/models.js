@@ -43,6 +43,30 @@ exports.fetchReviews = () => {
     });
 };
 
+exports.fetchReviewComments = (review_id) => {
+  return db
+    .query(`SELECT * FROM comments WHERE comments.review_id = $1`, [review_id])
+    .then(({ rows, rowCount }) => {
+      if (rowCount === 0) {
+        return db
+          .query(`SELECT * FROM reviews WHERE reviews.review_id = $1`, [
+            review_id,
+          ])
+          .then(({ rows }) => {
+            if (rows.length > 0) {
+              return {};
+            } else {
+              return Promise.reject({
+                status: 404,
+                msg: `No comments found for review_id: ${review_id}`,
+              });
+            }
+          });
+      }
+      return rows;
+    });
+};
+
 //PATCH
 exports.updatedReviewsById = (review_id, inc_votes) => {
   let queryValue = reviews[review_id - 1].votes;
@@ -61,6 +85,25 @@ exports.updatedReviewsById = (review_id, inc_votes) => {
       review_id,
       queryValue,
     ])
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+//POST
+exports.sendComment = (review_id, newComment) => {
+  const { username, body } = newComment;
+  if (typeof username !== "string" || typeof body !== "string") {
+    return Promise.reject({
+      status: 400,
+      msg: `Missing or incorrect fields required in body`,
+    });
+  }
+  return db
+    .query(
+      `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
+      [body, username, review_id]
+    )
     .then(({ rows }) => {
       return rows[0];
     });
