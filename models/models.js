@@ -54,7 +54,7 @@ exports.fetchReviewComments = (review_id) => {
           ])
           .then(({ rows }) => {
             if (rows.length > 0) {
-              return {};
+              return [];
             } else {
               return Promise.reject({
                 status: 404,
