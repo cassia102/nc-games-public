@@ -13,6 +13,8 @@ const {
   handle500Error,
   handleCustomError,
   handleInvalidInput,
+  handleInvalidInput2,
+  handleInvalidInput3,
 } = require("./controller/controller.errors");
 const app = express();
 
@@ -35,6 +37,8 @@ app.post("/api/reviews/:review_id/comments", postComment);
 app.all("*", handleInvalidPath);
 app.use(handleCustomError);
 app.use(handleInvalidInput);
+app.use(handleInvalidInput2);
+app.use(handleInvalidInput3);
 app.use(handle500Error);
 
 module.exports = app;

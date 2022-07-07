@@ -89,7 +89,7 @@ describe("GET /api/reviews/:review_id (comment count)", () => {
   });
 });
 
-describe("GET /api/reviews", () => {
+describe("GET /api/reviews (comment count)", () => {
   test("Responds with an array containing relevant review including the comment count from the review ID", () => {
     return request(app)
       .get("/api/reviews")
@@ -121,6 +121,16 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then(({ body: { reviews } }) => {
         expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("Test the reviews are returned in desc order", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=title")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("title", {
           descending: true,
         });
       });
@@ -202,12 +212,12 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(body.msg).toBe("Invalid Input");
       });
   });
-  test("200 Responds with an empty object if the review_id exists but has no comments", () => {
+  test("200 Responds with an empty array if the review_id exists but has no comments", () => {
     return request(app)
       .get("/api/reviews/10/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.comments).toEqual({});
+        expect(body.comments).toEqual([]);
       });
   });
 });
@@ -298,6 +308,62 @@ describe("POST /api/reviews/:review_id/comments", () => {
           review_id: 4,
           created_at: expect.any(String),
         });
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a body with malformed/missing fields", () => {
+    const newComment = {};
+    return request(app)
+      .post("/api/reviews/4/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or invalid input to body");
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a user that does not exist", () => {
+    const newComment = { username: "turnip", body: "102354684654" };
+    return request(app)
+      .post("/api/reviews/10/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid user or review id does not exist");
+      });
+  });
+  test("ERROR 400: Responds with a 400 error when passed a body with missing fields", () => {
+    const newComment = { username: "dav3rid" };
+    return request(app)
+      .post("/api/reviews/10/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing or invalid input to body");
+      });
+  });
+  test("ERROR 400: Responds with a 404 error when passed an invalid id", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
+    };
+    return request(app)
+      .post("/api/reviews/not_a_number/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Input");
+      });
+  });
+  test("ERROR 404: Responds with a 404 error when passed valid details and id that doesnt exist yet", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Fusce sodales, nibh at fringilla imperdiet, felis est malesuada neque, vitae elementum.",
+    };
+    return request(app)
+      .post("/api/reviews/42/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid user or review id does not exist");
       });
   });
 });

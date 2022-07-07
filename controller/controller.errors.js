@@ -18,7 +18,25 @@ exports.handleInvalidInput = (err, req, res, next) => {
   }
 };
 
+exports.handleInvalidInput2 = (err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(400).send({ msg: "Invalid user or review id does not exist" });
+  } else {
+    next(err);
+  }
+};
+
+exports.handleInvalidInput3 = (err, req, res, next) => {
+  if (err.code === "23502") {
+    res.status(400).send({ msg: "Missing or invalid input to body" });
+  } else {
+    next(err);
+  }
+};
+
 exports.handle500Error = (err, req, res, next) => {
   console.log(err);
   res.status(500).send({ msg: "Server error" });
 };
+
+//23503

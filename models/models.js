@@ -32,16 +32,25 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-exports.fetchReviews = () => {
+exports.fetchReviews = (sort_by = "created_at") => {
+  const validSortOptions = ["created_at"];
+
   return db
     .query(
-      `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY created_at DESC
+      `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY ${sort_by} DESC
     `
     )
     .then(({ rows }) => {
       return rows;
     });
 };
+
+// **FEATURE REQUEST**
+// The end point should also accept the following queries:
+
+// - `sort_by`, which sorts the articles by any valid column (defaults to date)
+// - `order`, which can be set to `asc` or `desc` for ascending or descending (defaults to descending)
+// - `category`, which filters the articles by the topic value specified in the query
 
 exports.fetchReviewComments = (review_id) => {
   return db
@@ -54,7 +63,7 @@ exports.fetchReviewComments = (review_id) => {
           ])
           .then(({ rows }) => {
             if (rows.length > 0) {
-              return {};
+              return [];
             } else {
               return Promise.reject({
                 status: 404,
@@ -93,12 +102,6 @@ exports.updatedReviewsById = (review_id, inc_votes) => {
 //POST
 exports.sendComment = (review_id, newComment) => {
   const { username, body } = newComment;
-  if (typeof username !== "string" || typeof body !== "string") {
-    return Promise.reject({
-      status: 400,
-      msg: `Missing or incorrect fields required in body`,
-    });
-  }
   return db
     .query(
       `INSERT INTO comments (author, body, review_id) VALUES ($2, $1, $3) RETURNING *;`,
