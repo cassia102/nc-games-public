@@ -89,7 +89,7 @@ describe("GET /api/reviews/:review_id (comment count)", () => {
   });
 });
 
-describe("GET /api/reviews", () => {
+describe("GET /api/reviews (comment count)", () => {
   test("Responds with an array containing relevant review including the comment count from the review ID", () => {
     return request(app)
       .get("/api/reviews")
@@ -121,6 +121,16 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then(({ body: { reviews } }) => {
         expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("Test the reviews are returned in desc order", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=title")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("title", {
           descending: true,
         });
       });
@@ -317,7 +327,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("No user found for username: turnip");
+        expect(body.msg).toBe("Invalid user or review id does not exist");
       });
   });
   test("ERROR 400: Responds with a 400 error when passed a body with missing fields", () => {
@@ -353,7 +363,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Review ID does not exist yet");
+        expect(body.msg).toBe("Invalid user or review id does not exist");
       });
   });
 });

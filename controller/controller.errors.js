@@ -20,7 +20,7 @@ exports.handleInvalidInput = (err, req, res, next) => {
 
 exports.handleInvalidInput2 = (err, req, res, next) => {
   if (err.code === "23503") {
-    res.status(400).send({ msg: "Review ID does not exist yet" });
+    res.status(400).send({ msg: "Invalid user or review id does not exist" });
   } else {
     next(err);
   }
