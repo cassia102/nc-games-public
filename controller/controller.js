@@ -8,7 +8,9 @@ const {
   fetchReviewComments,
   sendComment,
   removeCommentById,
+  fetchEndpoints,
 } = require("../models/models");
+const endpoints = require("../endpoints.json");
 
 //GET
 exports.getCategories = (req, res, next) => {
@@ -53,6 +55,10 @@ exports.getReviews = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.getEndpoints = (req, res, next) => {
+  res.send(endpoints);
 };
 
 exports.getReviewComments = (req, res, next) => {

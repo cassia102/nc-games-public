@@ -8,6 +8,7 @@ const {
   getReviewComments,
   postComment,
   deleteComment,
+  getEndpoints,
 } = require("./controller/controller");
 const {
   handleInvalidPath,
@@ -27,6 +28,7 @@ app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/users", getUsers);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id/comments", getReviewComments);
+app.get("/api", getEndpoints);
 
 //PATCH
 app.patch("/api/reviews/:review_id", patchReviewVotes);

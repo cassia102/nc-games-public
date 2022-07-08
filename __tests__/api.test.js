@@ -16,6 +16,11 @@ afterAll(() => {
 });
 
 //GET TESTS
+describe("GET /api", () => {
+  test("Responds with a list of all the endpoints available", () => {
+    return request(app).get("/api").expect(Array);
+  });
+});
 describe("GET /api/categories", () => {
   test("Responds with an array containing categories", () => {
     return request(app)
