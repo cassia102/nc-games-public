@@ -32,25 +32,60 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-exports.fetchReviews = (sort_by = "created_at") => {
-  const validSortOptions = ["created_at"];
+exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
+  const validSortOptions = [
+    "created_at",
+    "title",
+    "designer",
+    "owner",
+    "review_img_url",
+    "review_body",
+    "category",
+    "votes",
+  ];
+
+  if (!validSortOptions.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid sort_by query",
+    });
+  }
+
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+
+  let queryStr = "";
+  let queryValues = [];
 
   return db
-    .query(
-      `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id ORDER BY ${sort_by} DESC
-    `
-    )
+    .query(`SELECT * FROM categories WHERE categories.slug = $1`, [category])
+    .then(({ rows }) => {
+      if (rows.length === 0 && category !== undefined) {
+        return Promise.reject({
+          status: 404,
+          msg: `No category found for: ${category}`,
+        });
+      } else if (category !== undefined) {
+        queryStr += ` WHERE reviews.category = $1`;
+        queryValues.push(category);
+      }
+    })
+    .then(() => {
+      return db.query(
+        `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count FROM reviews 
+          LEFT JOIN comments ON reviews.review_id = comments.review_id 
+          ${queryStr} 
+          GROUP BY reviews.review_id 
+          ORDER BY ${sort_by} ${order}
+        `,
+        queryValues
+      );
+    })
     .then(({ rows }) => {
       return rows;
     });
 };
-
-// **FEATURE REQUEST**
-// The end point should also accept the following queries:
-
-// - `sort_by`, which sorts the articles by any valid column (defaults to date)
-// - `order`, which can be set to `asc` or `desc` for ascending or descending (defaults to descending)
-// - `category`, which filters the articles by the topic value specified in the query
 
 exports.fetchReviewComments = (review_id) => {
   return db

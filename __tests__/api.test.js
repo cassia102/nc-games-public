@@ -115,7 +115,7 @@ describe("GET /api/reviews (comment count)", () => {
         });
       });
   });
-  test("Test the reviews are returned in desc order", () => {
+  test("Test the reviews are returned in date desc order by default", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
@@ -125,7 +125,7 @@ describe("GET /api/reviews (comment count)", () => {
         });
       });
   });
-  test("Test the reviews are returned in desc order", () => {
+  test("Test the reviews are returned in title desc order", () => {
     return request(app)
       .get("/api/reviews?sort_by=title")
       .expect(200)
@@ -133,6 +133,48 @@ describe("GET /api/reviews (comment count)", () => {
         expect(reviews).toBeSortedBy("title", {
           descending: true,
         });
+      });
+  });
+  test("Test the reviews are returns in asc order if query is added", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", {
+          ascending: true,
+        });
+      });
+  });
+  test("Returns the reviews filtered by query category", () => {
+    return request(app)
+      .get("/api/reviews?category=social+deduction")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toHaveLength(11);
+      });
+  });
+  test("ERROR 400: if passed a non valid order query", () => {
+    return request(app)
+      .get("/api/reviews?order=invalid_order")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid order query");
+      });
+  });
+  test("ERROR 400: if passed a non valid sort_by query", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=invalid_sort_by")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid sort_by query");
+      });
+  });
+  test("ERROR 400: if passed a non valid filter query", () => {
+    return request(app)
+      .get("/api/reviews?category=invalid_category")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No category found for: invalid_category");
       });
   });
   test("ERROR 404: Responds with a 404 not found when passed an invalid path", () => {
