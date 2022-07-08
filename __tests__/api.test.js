@@ -414,4 +414,20 @@ describe("DELETE /api/comments/:comment_id", () => {
   test("This endpoint should delete the specified comment from the database and respond with a 204 No Content status.", () => {
     return request(app).delete("/api/comments/2").expect(204);
   });
+  test("ERROR 404: When passeed an id that doesnt exist yet", () => {
+    return request(app)
+      .delete("/api/comments/102")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No comment found at 102");
+      });
+  });
+  test("Error 400: When passed an id in the incorrect format", () => {
+    return request(app)
+      .delete("/api/comments/not_a_number")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Input");
+      });
+  });
 });

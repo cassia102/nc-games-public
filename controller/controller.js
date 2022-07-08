@@ -93,9 +93,13 @@ exports.postComment = (req, res, next) => {
 };
 
 //DELETE
-exports.deleteComment = (req, res) => {
+exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
-  removeCommentById(comment_id).then((comments) => {
-    res.status(204).send();
-  });
+  removeCommentById(comment_id)
+    .then((comments) => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
