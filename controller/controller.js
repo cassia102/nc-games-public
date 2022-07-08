@@ -7,6 +7,7 @@ const {
   fetchReviews,
   fetchReviewComments,
   sendComment,
+  removeCommentById,
 } = require("../models/models");
 
 //GET
@@ -89,4 +90,12 @@ exports.postComment = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+//DELETE
+exports.deleteComment = (req, res) => {
+  const { comment_id } = req.params;
+  removeCommentById(comment_id).then((comments) => {
+    res.status(204).send();
+  });
 };

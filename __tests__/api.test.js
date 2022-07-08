@@ -409,3 +409,9 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("This endpoint should delete the specified comment from the database and respond with a 204 No Content status.", () => {
+    return request(app).delete("/api/comments/2").expect(204);
+  });
+});

@@ -7,6 +7,7 @@ const {
   getReviews,
   getReviewComments,
   postComment,
+  deleteComment,
 } = require("./controller/controller");
 const {
   handleInvalidPath,
@@ -32,6 +33,9 @@ app.patch("/api/reviews/:review_id", patchReviewVotes);
 
 //POST
 app.post("/api/reviews/:review_id/comments", postComment);
+
+//DELETE
+app.delete("/api/comments/:comment_id", deleteComment);
 
 //ERROR HANDLERS
 app.all("*", handleInvalidPath);
